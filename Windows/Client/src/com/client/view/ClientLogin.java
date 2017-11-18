@@ -6,6 +6,8 @@ package com.client.view;
 import java.io.*;
 import javax.swing.*;
 
+import org.json.simple.JSONObject;
+
 import com.client.controlor.ClientUser;
 import com.client.tools.*;
 import com.common.model.*;
@@ -102,12 +104,21 @@ public class ClientLogin extends JFrame implements ActionListener {
 
 					ObjectOutputStream oos = new ObjectOutputStream(ManageClientConServerThread
 							.getClientConServerThread(u.getUserId()).getS().getOutputStream());
-
+					
+					JSONObject m = new JSONObject();
+					System.out.println("ClientLogin"+m.toString());
+					m.put("mesType", MessageType.message_get_onLineFriend);
+					m.put("sender", u.getUserId());
+					oos.writeObject(m);
+					
+					/*
 					Message m = new Message();
 					m.setMesType(MessageType.message_get_onLineFriend);
 					
 					m.setSender(u.getUserId());
 					oos.writeObject(m);
+					*/
+					
 				} catch (Exception e) {
 					e.printStackTrace();
 				}

@@ -7,6 +7,9 @@ import com.client.tools.*;
 import com.common.model.*;
 
 import java.util.*;
+
+import org.json.simple.JSONObject;
+
 import java.net.*;
 import java.io.*;
 
@@ -24,9 +27,14 @@ public class ClientConServer {
 
 			ObjectInputStream ois = new ObjectInputStream(s.getInputStream());
 
-			Message ms = (Message) ois.readObject();
+			//Message ms = (Message) ois.readObject();
+			JSONObject ms = (JSONObject) ois.readObject();
+			
+			System.out.println("ClientConServer"+ms.toString());
+			
 			// check user login
-			if (ms.getMesType().equals("1")) {
+			System.out.println("ClientConServer2"+ms.get("mesType").toString());
+			if (ms.get("mesType").toString().equals("1")) {
 				// create a thread connected between this user and server
 				ClientConServerThread ccst = new ClientConServerThread(s);
 				ccst.start();

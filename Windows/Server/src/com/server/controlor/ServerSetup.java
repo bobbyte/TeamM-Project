@@ -12,6 +12,8 @@ import java.net.*;
 import java.io.*;
 import java.util.*;
 
+import org.json.simple.JSONObject;
+
 public class ServerSetup {
 
 	public ServerSetup() {
@@ -27,11 +29,13 @@ public class ServerSetup {
 
 				ObjectInputStream ois = new ObjectInputStream(s.getInputStream());
 				User u = (User) ois.readObject();
-				Message m = new Message();
+				//Message m = new Message();
+				JSONObject m = new JSONObject();
 				ObjectOutputStream oos = new ObjectOutputStream(s.getOutputStream());
 				
 				if (u.getPasswd().equals("123456")) {
-					m.setMesType("1");
+					//m.setMesType("1");
+					m.put("mesType", MessageType.message_succeed);
 					oos.writeObject(m);
 
 					ServerConClientThread scct = new ServerConClientThread(s);
@@ -41,7 +45,8 @@ public class ServerSetup {
 
 					scct.notifyOther(u.getUserId());
 				} else {
-					m.setMesType("2");
+					//m.setMesType("2");
+					m.put("mesType", MessageType.message_login_fail);
 					oos.writeObject(m);
 					s.close();
 

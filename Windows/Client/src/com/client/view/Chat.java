@@ -18,6 +18,8 @@ import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
+import org.json.simple.JSONObject;
+
 import com.client.controlor.ClientConServer;
 import com.client.tools.ManageClientConServerThread;
 import com.common.model.Message;
@@ -57,20 +59,35 @@ public class Chat extends JFrame implements ActionListener {
 	}
 
 	// show message
-	public void showMessage(Message m) {
+	public void showMessage(JSONObject m) {
+		/*
 		String info = m.getSender() + " said to " + m.getGetter() + " :" + m.getCon() + "\r\n";
+		*/
+		System.out.println("Chat"+m.toString());
+		String info = m.get("sender") + " said to " + m.get("getter") + " :" + m.get("connection") + "\r\n";
 		this.jta.append(info);
 	}
 
 	public void actionPerformed(ActionEvent arg0) {
 		if (arg0.getSource() == jb) {
 			// click "sent" button
+			/*
 			Message m = new Message();
 			m.setMesType(MessageType.message_comm_mes);
 			m.setSender(this.ownerId);
 			m.setGetter(this.friendId);
 			m.setCon(jtf.getText());
 			m.setSendTime(new java.util.Date().toString());
+			*/
+			JSONObject m = new JSONObject();
+			m.put("mesType", MessageType.message_comm_mes);
+			m.put("sender", this.ownerId);
+			m.put("getter", this.friendId);
+			m.put("connection", jtf.getText());
+			m.put("sendTime", new java.util.Date().toString());
+			
+			System.out.println("Chat" +m.toString());
+			
 			// send to server
 			try {
 				ObjectOutputStream oos = new ObjectOutputStream(

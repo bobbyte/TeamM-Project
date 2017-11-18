@@ -5,6 +5,8 @@ package com.server.tools;
 
 import java.util.*;
 
+import org.json.simple.JSONObject;
+
 import com.common.model.*;
 
 import java.net.*;
@@ -21,8 +23,31 @@ public class ServerConClientThread extends Thread {
 	public void notifyOther(String iam) {
 		// get all online user threads
 		HashMap hm = ManageServerConClientThread.hm;
+		@SuppressWarnings("rawtypes")
 		Iterator it = hm.keySet().iterator();
 
+		while (it.hasNext()) {
+			JSONObject m = new JSONObject();
+			m.put("connection", iam);
+			m.put("mesType", MessageType.message_ret_onLineFriend);
+			
+			
+
+			String onLineUserId = it.next().toString();
+			try {
+				ObjectOutputStream oos = new ObjectOutputStream(
+						ManageServerConClientThread.getClientThread(onLineUserId).s.getOutputStream());
+				m.put("getter", onLineUserId);
+				
+				System.out.println("ServerConClientThread" +m.toString());
+				oos.writeObject(m);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+
+		}
+		
+		/*
 		while (it.hasNext()) {
 			Message m = new Message();
 			m.setCon(iam);
@@ -39,6 +64,7 @@ public class ServerConClientThread extends Thread {
 			}
 
 		}
+		*/
 	}
 
 	public void run() {
@@ -47,8 +73,31 @@ public class ServerConClientThread extends Thread {
 
 			try {
 				ObjectInputStream ois = new ObjectInputStream(s.getInputStream());
-				Message m = (Message) ois.readObject();
+				JSONObject m = (JSONObject) ois.readObject();
+				
+				if (m.get("mesType").equals(MessageType.message_comm_mes)) {
+					// get thread from getter
+					ServerConClientThread sc = ManageServerConClientThread.getClientThread(m.get("getter").toString());
+					ObjectOutputStream oos = new ObjectOutputStream(sc.s.getOutputStream());
+					oos.writeObject(m);
+				} else if (m.get("mesType").equals(MessageType.message_ret_onLineFriend)) {
+					String res = ManageServerConClientThread.getAllOnLineUserid();
+					
+					JSONObject m2 = new JSONObject();
+					
+					m2.put("mesType", MessageType.message_comm_mes);
+					m2.put("connection", res);
+					m2.put("getter", m.get("sender"));
+				
+					
+					
+					ObjectOutputStream oos = new ObjectOutputStream(s.getOutputStream());
+					oos.writeObject(m2);
+				}
 
+				/*
+				 
+				 Message m = (Message) ois.readObject();
 				// check the message from a client, then make response
 				if (m.getMesType().equals(MessageType.message_comm_mes)) {
 					// get thread from getter
@@ -64,6 +113,7 @@ public class ServerConClientThread extends Thread {
 					ObjectOutputStream oos = new ObjectOutputStream(s.getOutputStream());
 					oos.writeObject(m2);
 				}
+				*/
 
 			} catch (Exception e) {
 				e.printStackTrace();
